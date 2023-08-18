@@ -116,6 +116,6 @@ app.get("/trains/:trainNumber", async (req, res) => {
   });
 
 
-app.listen(3000,()=>{
+app.listen(3001,()=>{
         console.log("Server Is running on port 3000");
     });
