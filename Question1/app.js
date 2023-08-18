@@ -29,7 +29,7 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.post('/train/auth', async (req, res) => {
+app.post('/auth', async (req, res) => {
     const authData=req.body;
 
     try {
@@ -44,9 +44,76 @@ app.post('/train/auth', async (req, res) => {
         res.status(500).json({ message: 'An error occurred' });
     }
 });
+app.get('/trains', async (req, res) => {
+    try {
+        const authToken = req.header('Authorization');
+        // console.log(authToken);
+        if (!authToken) {
+            return res.status(401).json({ message: 'Authorization token missing' });
+        }
+        
 
+        const response = await axios.get("http://20.244.56.144/train/trains", {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        });
 
+        if (response.status === 200) {
+            const trainDetails = response.data;
+            res.status(200).json(trainDetails);
+        } else {
+            res.status(500).json({ message: 'Failed to fetch train details' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred' });
+    }
+});
 
+// app.get("train/trains/:trainNumber", async (req, res) => {
+//     try {
+//       const trainNumber = req.params.trainNumber;
+  
+//       // Get the authorization token from the request headers
+//       const authToken = req.headers.authorization;
+  
+//       const headers = {
+//         Authorization: `Bearer ${authToken}`
+//       };
+  
+//       const response = await axios.get(`http://20.244.56.144/train/trains/${trainNumber}`, {
+//         headers
+//       });
+  
+//       const trainDetails = response.data;
+//       res.status(200).json(trainDetails);
+//     } catch (error) {
+//       console.error("Error fetching train details:", error);
+//       res.status(500).json({ error: "Failed to fetch train details" });
+//     }
+//   });
+
+// Define the endpoint to get details of a particular train
+app.get("/trains/:trainNumber", async (req, res) => {
+    try {
+      const trainNumber = req.params.trainNumber;
+      const authToken = req.headers.authorization;
+  
+      const headers = {
+        Authorization: authToken
+      };
+  
+      const response = await axios.get(`http://20.244.56.144/train/trains/${trainNumber}`, {
+        headers
+      });
+  
+      const trainDetails = response.data;
+      res.status(200).json(trainDetails);
+    } catch (error) {
+      console.error("Error fetching train details:", error);
+      res.status(500).json({ error: "Failed to fetch train details" });
+    }
+  });
 
 
 app.listen(3000,()=>{
